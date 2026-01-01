@@ -16,6 +16,7 @@ namespace SearchService.Services
 
         public async Task<List<Item>> GetItemsForSearchDb()
         {
+            // Used for migrations -> take data from AuctionService's Items table and populate here in MongDB
             var lastUpdated = await DB.Find<Item, string>()
                 .Sort(x => x.Descending(x => x.UpdatedAt))
                 .Project(x => x.UpdatedAt.ToString())

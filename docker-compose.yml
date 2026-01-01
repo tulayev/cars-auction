@@ -1,13 +1,18 @@
 services:
   postgres:
-    image: postgres:latest
+    container_name: postgres
+    image: postgres:17
     environment:
-      POSTGRES_PASSWORD: postgrespw
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgrespw
+      - POSTGRES_DB=AuctionsDb
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+  
   mongodb:
+    container_name: mongo
     image: mongo:latest
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
@@ -16,6 +21,13 @@ services:
       - "27017:27017"
     volumes:
       - mongodata:/data/db
+  
+  rabbitmq:
+    container_name: rabbit
+    image: rabbitmq:4-management-alpine
+    ports:
+      - "15672:15672"
+      - "5672:5672"
 
 volumes:
   pgdata:
