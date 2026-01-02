@@ -4,6 +4,7 @@ using AuctionService.Entities;
 using AutoMapper;
 using Contracts;
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -50,12 +51,13 @@ namespace AuctionService.Controllers
             return _mapper.Map<AuctionDto>(auction);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<AuctionDto>> CreateAuction([FromBody] CreateAuctionDto auctionDto)
         {
             var auction = _mapper.Map<Auction>(auctionDto);
 
-            auction.Seller = "test";
+            auction.Seller = User.Identity!.Name;
 
             _context.Auctions.Add(auction);
 
@@ -73,6 +75,7 @@ namespace AuctionService.Controllers
             return CreatedAtAction(nameof(GetAuction), new { id = auction.Id }, newAuction);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<AuctionDto>> UpdateAuction(Guid id, [FromBody] UpdateAuctionDto auctionDto)
         {
@@ -83,6 +86,11 @@ namespace AuctionService.Controllers
             if (auction == null)
             {
                 return NotFound();
+            }
+
+            if (auction.Seller != User.Identity!.Name)
+            {
+                return Forbid();
             }
 
             auction.Item!.Make = auctionDto.Make ?? auction.Item.Make;
@@ -105,6 +113,7 @@ namespace AuctionService.Controllers
             return Ok(updatedAuction);
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAuction(Guid id)
         {
@@ -113,6 +122,11 @@ namespace AuctionService.Controllers
             if (auction == null)
             {
                 return NotFound();
+            }
+
+            if (auction.Seller != User.Identity!.Name)
+            {
+                return Forbid();
             }
 
             _context.Auctions.Remove(auction);
