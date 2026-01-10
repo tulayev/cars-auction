@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /app
 
-COPY CarsAuctions.sln ./
+COPY CarsAuction.sln ./
 COPY src/IdentityService/IdentityService.csproj ./src/IdentityService/
 
 RUN dotnet restore ./src/IdentityService/IdentityService.csproj

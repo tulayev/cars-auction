@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-COPY CarsAuctions.sln ./
+COPY CarsAuction.sln ./
 COPY src/SearchService/SearchService.csproj ./src/SearchService/
 COPY src/Contracts/Contracts.csproj ./src/Contracts/
 
