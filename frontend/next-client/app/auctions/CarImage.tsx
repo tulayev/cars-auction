@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
-type Props = {
+interface Props {
   imageUrl: string;
   model: string;
 }

@@ -2,7 +2,7 @@ import { Auction } from '@/models';
 import CarImage from './CarImage';
 import CountdownTimer from './CountdownTimer';
 
-type Props = {
+interface Props {
   auction: Auction
 }
 
