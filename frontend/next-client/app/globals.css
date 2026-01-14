@@ -3,5 +3,9 @@
 @source "../.flowbite-react/class-list.json";
 
 [role=button], button {
-    cursor: pointer;
+  cursor: pointer;
+}
+
+.react-datepicker-wrapper {
+  width: 100%;
 }

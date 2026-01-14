@@ -1,20 +1,41 @@
 'use client';
 
-import { Button, HelperText, Spinner, TextInput } from 'flowbite-react';
+import { Button, Spinner } from 'flowbite-react';
 import { useRouter } from 'next/navigation';
 import { FieldValues, useForm } from 'react-hook-form';
+import Input from '../components/Input';
+import { useEffect } from 'react';
+import DateInput from '../components/DateInput';
+import { createAuction } from '../actions';
+import toast from 'react-hot-toast';
 
 export default function AuctionForm() {
   const router = useRouter();
   const {
-    register,
+    control,
     handleSubmit,
     setFocus,
-    formState: {isSubmitting, isValid, isDirty, errors}
-  } = useForm();
+    formState: {isSubmitting, isValid, isDirty}
+  } = useForm({
+    mode: 'onTouched'
+  });
   
-  function onSumbit(data: FieldValues): void {
-    console.log(data);
+  useEffect(() => {
+    setFocus('make');
+  }, [setFocus]);
+
+  async function onSumbit(data: FieldValues): Promise<void> {
+    try {
+      const response = await createAuction(data);
+
+      if (response.error) {
+        throw response.error;
+      }
+
+      router.push(`/aucions/details/${response.id}`);
+    } catch (error: any) {
+      toast.error(`${error.status} ${error.message}`);
+    }
   }
 
   return (
@@ -22,26 +43,68 @@ export default function AuctionForm() {
       onSubmit={handleSubmit(onSumbit)} 
       className="flex flex-col mt-3"
     >
-      <div className="mb-3 block">
-        <TextInput 
-          {...register('make', {required: 'Make is required'})}
-          color={errors?.make && 'failure'}
-          placeholder="Make"
-        />
-        <HelperText color="failure">
-          {errors.make?.message as string}
-        </HelperText>
-      </div>
+      <Input 
+        name="make"
+        label="Make"
+        control={control}
+        rules={{required: 'Make is required'}}
+      />
 
-      <div className="mb-3 block">
-        <TextInput 
-          {...register('model', {required: 'Model is required'})}
-          color={errors?.model && 'failure'}
-          placeholder="Model"
+      <Input 
+        name="model"
+        label="Model"
+        control={control}
+        rules={{required: 'Model is required'}}
+      />
+
+      <Input 
+        name="color"
+        label="Color"
+        control={control}
+        rules={{required: 'Color is required'}}
+      />
+
+      <div className="grid grid-cols-2 gap-3">
+        <Input 
+          name="year"
+          label="Year"
+          type="number"
+          control={control}
+          rules={{required: 'Year is required'}}
         />
-        <HelperText color="failure">
-          {errors.model?.message as string}
-        </HelperText>
+
+        <Input 
+          name="mileage"
+          label="Mileage"
+          control={control}
+          rules={{required: 'Mileage is required'}}
+        />
+      </div>
+      
+      <Input 
+        name="imageUrl"
+        label="Image URL"
+        control={control}
+        rules={{required: 'Image URL is required'}}
+      />
+
+      <div className="grid grid-cols-2 gap-3">
+        <Input 
+          name="reservePrice"
+          label="Reserve price (enter 0 if no reserve)"
+          type="number"
+          control={control}
+          rules={{required: 'Reserve price is required'}}
+        />
+
+        <DateInput 
+          name="auctionEnd"
+          label="Auction end date/time"
+          control={control}
+          rules={{required: 'Auction end date is required'}}
+          dateFormat="dd MMMM yyyy h:mm a"
+          showTimeSelect
+        />
       </div>
 
       <div className="flex justify-between">
