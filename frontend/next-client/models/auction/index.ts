@@ -1,5 +1,5 @@
 export interface Auction {
-  reservePrice?: number;
+  reservePrice: number;
   seller: string;
   winner?: string;
   soldAmount?: number;

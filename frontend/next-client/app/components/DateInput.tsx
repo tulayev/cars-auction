@@ -21,7 +21,7 @@ export default function DateInput(props: Props) {
           `
             rounded-lg w-full border border-gray-600 p-2 flex flex-col
             ${fieldState.error 
-              ? 'bg-red-50 bg-red-500 text-red-900' 
+              ? 'bg-red-50 border-red-500 text-red-900' 
               : (!fieldState.invalid && fieldState.isDirty) ? 'bg-green-50 border-green-500 text-green-900' : ''}
           `
         }

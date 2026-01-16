@@ -8,12 +8,20 @@ export async function getData(query: string): Promise<PagedResult<Auction>> {
   return fetchWrapper.get(`search${query}`);
 }
 
-export async function getDetailsViewData(id: string): Promise<Auction> {
+export async function getDetailedViewData(id: string): Promise<Auction> {
   return fetchWrapper.get(`auctionns/${id}`);
 }
 
 export async function createAuction(data: FieldValues): Promise<any> {
   return fetchWrapper.post('auctions', data);
+}
+
+export async function updateAuction(data: FieldValues, id: string): Promise<any> {
+  return fetchWrapper.put(`auctions/${id}`, data);
+}
+
+export async function deleteAuction(id: string): Promise<any> {
+  return fetchWrapper.del(`auctions/${id}`);
 }
 
 export async function updateAuctionTest(): Promise<{status: number, message: string}> {
