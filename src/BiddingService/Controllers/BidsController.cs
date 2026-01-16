@@ -1,4 +1,6 @@
-﻿using BiddingService.Models;
+﻿using AutoMapper;
+using BiddingService.DTOs;
+using BiddingService.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Entities;
@@ -10,26 +12,28 @@ namespace BiddingService.Controllers
     public class BidsController : ControllerBase
     {
         private readonly DB _db;
+        private readonly IMapper _mapper;
 
-        public BidsController(DB db)
+        public BidsController(DB db, IMapper mapper)
         {
             _db = db;
+            _mapper = mapper;
         }
 
         [HttpGet("{auctionId}")]
-        public async Task<ActionResult<IEnumerable<Bid>>> GetBidsForAuction(string auctionId)
+        public async Task<ActionResult<IEnumerable<BidDto>>> GetBidsForAuction(string auctionId)
         {
             var bids = await _db.Find<Bid>()
                 .Match(x => x.AutionId == auctionId)
                 .Sort(x => x.Descending(x => x.BidTime))
                 .ExecuteAsync();
 
-            return bids;
+            return bids.Select(_mapper.Map<BidDto>).ToList();
         }
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<Bid>> PlaceBid(string auctionId, int amount)
+        public async Task<ActionResult<BidDto>> PlaceBid(string auctionId, int amount)
         {
             var auction = await _db.Find<Auction>().OneAsync(auctionId);
 
@@ -76,7 +80,7 @@ namespace BiddingService.Controllers
 
             await _db.SaveAsync(bid);
 
-            return Ok(bid);
+            return Ok(_mapper.Map<BidDto>(bid));
         }
     }
 }
