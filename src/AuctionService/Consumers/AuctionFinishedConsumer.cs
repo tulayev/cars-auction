@@ -16,7 +16,7 @@ namespace AuctionService.Consumers
 
         public async Task Consume(ConsumeContext<AuctionFinished> context)
         {
-            var auction = await _context.Auctions.FindAsync(context.Message.AuctionId)
+            var auction = await _context.Auctions.FindAsync(Guid.Parse(context.Message.AuctionId))
                 ?? throw new InvalidOperationException($"Auction with ID {context.Message.AuctionId} not found.");
 
             if (context.Message.ItemSold)
