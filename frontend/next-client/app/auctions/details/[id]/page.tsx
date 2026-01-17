@@ -31,7 +31,10 @@ export default async function Details({params}: {params: Promise<{id: string}>})
 
       <div className="grid grid-cols-2 gap-6 mt-3">
         <div className="relative w-full bg-gray-200 aspect-16/10 rounded-lg overflow-hidden">
-          <CarImage imageUrl={auction.imageUrl} model={auction.model} />
+          <CarImage 
+            imageUrl={auction.imageUrl} 
+            model={auction.model} 
+          />
         </div>
         <div className="border-2 rounded-lg p-2 bg-gray-200">
           <Heading title="Bids" />

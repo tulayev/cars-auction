@@ -9,7 +9,7 @@ export async function getData(query: string): Promise<PagedResult<Auction>> {
 }
 
 export async function getDetailedViewData(id: string): Promise<Auction> {
-  return fetchWrapper.get(`auctionns/${id}`);
+  return fetchWrapper.get(`auctions/${id}`);
 }
 
 export async function createAuction(data: FieldValues): Promise<any> {
