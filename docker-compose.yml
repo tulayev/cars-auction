@@ -148,6 +148,22 @@ services:
       mongodb:
         condition: service_healthy
 
+  notify-svc:
+    container_name: notification-service-web
+    image: umarbek/notify-svc:latest
+    build: 
+      context: .
+      dockerfile: src/NotificationService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMQ__Host=rabbitmq
+    ports:
+      - "7004:80"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
 volumes:
   pgdata:
   mongodata:
