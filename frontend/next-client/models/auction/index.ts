@@ -16,3 +16,11 @@ export interface Auction {
   imageUrl: string;
   id: string;
 };
+
+export interface AuctionFinished {
+  itemSold: boolean
+  auctionId: string
+  winner?: string;
+  seller: string;
+  amount?: number;
+};
