@@ -1,3 +1,4 @@
+import { url } from 'inspector';
 import NextAuth, { Profile } from 'next-auth';
 import { OIDCConfig } from 'next-auth/providers';
 import DuendeIDS6Provider from 'next-auth/providers/duende-identity-server6';
@@ -8,12 +9,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       id: 'id-server',
       clientId: 'nextApp', // specified in Config.cs from IdentityService project 
       clientSecret: 'secret', // specified in Config.cs from IdentityService project
-      issuer: 'http://localhost:5001', // IdentityService web app url
-      authorization: {params: {scope: 'openid profile auctionApp'}},
+      issuer: process.env.IDENTITY_URL, // IdentityService web app url
+      authorization: {
+        params: {scope: 'openid profile auctionApp'},
+        url: `${process.env.IDENTITY_URL}/connect/authorize`
+      },
+      token: {
+        url: `${process.env.IDENTITY_URL_INTERNAL}/connect/token`
+      },
+      userinfo: {
+        url: `${process.env.IDENTITY_URL_INTERNAL}/connect/token`
+      },
       idToken: true
     } as OIDCConfig<Omit<Profile, 'username'>>),
   ],
   callbacks: {
+    async redirect({url, baseUrl}) {
+      return url.startsWith(baseUrl) ? url : baseUrl;
+    },
     async authorized({auth}) {
       return !!auth;
     },

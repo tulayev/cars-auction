@@ -107,6 +107,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_URLS=http://+:80
+      - ClientApp=http://localhost:3000
+      - IssuerUri=http://localhost:5001
       - ConnectionStrings__DefaultConnection=Server=postgres;Port=5432;Database=IdentityDb;User Id=postgres;Password=postgrespw;Include Error Detail=true
     ports:
       - "5001:80"
@@ -163,6 +165,34 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+
+  next-client:
+    container_name: next-client
+    image: umarbek/next-client:latest
+    build: 
+      context: .
+      dockerfile: frontend/next-client/Dockerfile
+    volumes:
+      - /var/lib/web/data
+    ports:
+      - "3000:3000"
+    environment:
+      - AUTH_SECRET=""
+      - API_URL=http://gateway-svc/
+      - IDENTITY_URL=http://localhost:5001
+      - IDENTITY_URL_INTERNAL=http://identity-svc
+      - AUTH_URL=http://localhost:3000
+      - AUTH_URL_INTERNAL=http://next-client:3000
+  
+  nginx-proxy:
+    container_name: nginx-proxy
+    image: nginxproxy/nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./devcerts:/etc/nginx/certs
 
 volumes:
   pgdata:
