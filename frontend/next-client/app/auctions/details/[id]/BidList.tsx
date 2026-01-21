@@ -5,7 +5,7 @@ import Heading from '@/app/components/Heading';
 import { useBidStore } from '@/hooks';
 import { Auction, Bid } from '@/models';
 import { User } from 'next-auth';
-import { useEffect, useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import BidItem from './BidItem';
 import { numberWithCommas } from '@/lib';
@@ -21,8 +21,16 @@ export default function BidList({user, auction}: Props) {
   const [loading, setLoading] = useState(true);
   const bids = useBidStore(state => state.bids);
   const setBids = useBidStore(state => state.setBids);
+  const open = useBidStore(state => state.open);
+  const setOpen = useBidStore(state => state.setOpen);
+  const openForBids = new Date(auction.auctionEnd) > new Date();
+  let content: JSX.Element;
 
-  const highBid = bids.reduce((prev, current) => prev > current.amount ? prev : current.amount, 0);
+  const highBid = bids.reduce((prev, current) => prev > current.amount 
+    ? prev 
+    : current.bidStatus.includes('Accepted')
+    ? current.amount
+    : prev, 0);
 
   useEffect(() => {
     getBidsForAuction(auction.id)
@@ -42,8 +50,39 @@ export default function BidList({user, auction}: Props) {
       })
   }, [auction.id, setBids]);
 
+  useEffect(() => {
+    setOpen(openForBids);
+  }, [openForBids, setOpen]);
+
   if (loading) {
     return <span>Loading bids...</span>
+  }
+
+  if (!open) {
+    content = (
+      <div className="flex items-center justify-center p-2 text-lg font-semibold">
+        This auction has finished
+      </div>
+    );
+  } else if (!user) {
+    content = (
+      <div className="flex items-center justify-center p-2 text-lg font-semibold">
+        Please login to place a bid
+      </div>
+    );
+  } else if (user.username === auction.seller) {
+    content = (
+      <div className="flex items-center justify-center p-2 text-lg font-semibold">
+        You cannot bid on your own auction
+      </div>
+    );
+  } else {
+    content = (
+      <BidForm
+        auctionId={auction.id}
+        highBid={highBid}
+      />
+    );
   }
 
   return (
@@ -73,24 +112,7 @@ export default function BidList({user, auction}: Props) {
       </div>
       
       <div className="px-2 pb-2 text-gray-500">
-        {!open ? (
-          <div className="flex items-center justify-center p-2 text-lg font-semibold">
-            This auction has finished
-          </div>
-        ) : !user ? (
-          <div className="flex items-center justify-center p-2 text-lg font-semibold">
-            Please login to place a bid
-          </div>
-        ) : user && user.username === auction.seller ? (
-          <div className="flex items-center justify-center p-2 text-lg font-semibold">
-            You cannot bid on your own auction
-          </div>
-        ) : (
-          <BidForm 
-            auctionId={auction.id} 
-            highBid={highBid} 
-          />
-        )}
+        {content}
       </div>
     </div>
   )
